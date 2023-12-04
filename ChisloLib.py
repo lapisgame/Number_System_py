@@ -119,7 +119,7 @@ class chislo:
         new_znach = new_znach[::-1] + '.' + new_drob
         return chislo(znach=new_znach, osnov=new_osnov)
 
-    # Сложение Self и Other
+    #! Сложение Self и Other
     def __add__(self, other):
         # Если СС разные то к одной
         if self.osnov != other.osnov:
@@ -187,13 +187,91 @@ class chislo:
         new_znach = new_znach[::-1]
         new_drob = new_drob[::-1]
 
-        return chislo(znach=new_znach + '.' + new_drob, osnov=self.osnov_int)
+        return chislo(znach=f'{new_znach}.{new_drob}', osnov=self.osnov_int)
 
 
-    #Вычитание Other из Self
+    #!Вычитание Other из Self
     def __sub__(self, other):
-        print('MIN')
-        pass
+        if (int(f'{self.znach}', self.osnov_int)) + (int(f'{self.drob}', self.osnov_int) / (self.osnov_int ** len(self.drob))) < \
+            (int(f'{other.znach}', other.osnov_int)) + (int(f'{other.drob}', other.osnov_int) / (other.osnov_int ** len(other.drob))):
+            raise ValueError('В результате должно получиться отрицательно значение, такие вычисления не вохможно произвести')
+
+
+        if self.osnov_int != other.osnov_int:
+            other = other.toP(self.osnov_int)
+        
+        base = self.osnov_int
+        num1 = self.znach
+        num1_drob = self.drob
+
+        num2 = other.znach
+        num2_drob = other.drob
+
+        while len(num1) < len(num2):
+            num1 = '0' + num1
+        while len(num2) < len(num1):
+            num2 = '0' + num2
+
+        while len(num1_drob) < len(num2_drob):
+            num1_drob = num1_drob + '0'
+        while len(num2_drob) < len(num1_drob):
+            num2_drob = num2_drob + '0'
+
+        borrow = 0
+        result_drob = ""
+        
+        for i in range(len(num1_drob) - 1, -1, -1):
+            digit1 = int(num1_drob[i], base)
+            digit2 = int(num2_drob[i], base)
+
+            # Учитываем заем
+            digit1 -= borrow
+
+            # Если digit1 < digit2, занимаем у следующего разряда
+            if digit1 < digit2:
+                digit1 += base
+                borrow = 1
+            else:
+                borrow = 0
+
+            # Вычисляем текущий разряд результата
+            result_digit = digit1 - digit2
+            result_drob = str(result_digit) + result_drob
+
+        # Удаляем ведущие нули
+        result_drob = result_drob.rstrip('0')
+
+        if len(result_drob) == 0:
+            result_drob = '0'
+
+        # Выполняем вычитание над целой частью
+        result = ""
+        for i in range(len(num1) - 1, -1, -1):
+            digit1 = int(num1[i], base)
+            digit2 = int(num2[i], base)
+
+            # Учитываем заем
+            digit1 -= borrow
+
+            # Если digit1 < digit2, занимаем у следующего разряда
+            if digit1 < digit2:
+                digit1 += base
+                borrow = 1
+            else:
+                borrow = 0
+
+            # Вычисляем текущий разряд результата
+            result_digit = digit1 - digit2
+            result = str(result_digit) + result
+
+        # Удаляем ведущие нули
+        result = result.lstrip('0')
+
+        if len(result) == 0:
+            result = '0'
+
+        return chislo(znach=f'{result}.{result_drob}', osnov=base)
+
 
     #! Пока только целое
     def __mul__(self, other):
