@@ -89,7 +89,7 @@ def dop_to_int10(z):
     count = 0
     for i in y[::-1]:
         digit = int(i)
-        x = x*10 + 2**count * digit
+        x += 2**count * digit
         count += 1
     x = -x
 
@@ -97,7 +97,7 @@ def dop_to_int10(z):
 
 x = int(input('x = '))
 y,y_inv,z = int10_to_dop(x)
-print(f'x_2 = {y}', f'x_2 inv = {y_inv}', f'x_2 inv + 1 = {z}', sep='\n')
+print(f'x_2 = {y}', f'x_2 inv = {y_inv}', f'x_2 inv + 1 = {z}', sep='\n', end='\n\n')
 
 y_inv, y, x = dop_to_int10(z)
-print(f'x_2 inv = {y_inv}', f'x_2 = {y}', f'x = {x}', sep='\n')
+print(f'x_2 inv + 1 = {z}', f'x_2 inv = {y_inv}', f'x_2 = {y}', f'x = {x}', sep='\n')

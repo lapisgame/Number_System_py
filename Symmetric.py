@@ -96,7 +96,7 @@ def symmetric_ternary_to_decimal(symmetric_num):
     return res
 
 # Пример использования
-decimal_number = -99.9999
+decimal_number = -5.25
 symmetric_ternary = decimal_to_symmetric_ternary(decimal_number)
 print(f"Десятичное число {decimal_number} в троичной симметричной системе: {symmetric_ternary}")
 decimal_number_2 = symmetric_ternary_to_decimal(symmetric_ternary)
