@@ -236,7 +236,7 @@ class chislo:
 
             # Вычисляем текущий разряд результата
             result_digit = digit1 - digit2
-            result_drob = str(result_digit) + result_drob
+            result_drob = alphabet[result_digit] + result_drob
 
         # Удаляем ведущие нули
         result_drob = result_drob.rstrip('0')
@@ -262,7 +262,7 @@ class chislo:
 
             # Вычисляем текущий разряд результата
             result_digit = digit1 - digit2
-            result = str(result_digit) + result
+            result = alphabet[result_digit] + result
 
         # Удаляем ведущие нули
         result = result.lstrip('0')
@@ -275,8 +275,55 @@ class chislo:
 
     #! Пока только целое
     def __mul__(self, other):
-        osnov = self.osnov_int
-        self = self.to10()
-        other = other.to10()
+        base = self.osnov_int
+        
+        a = f"{self.znach}.{self.drob}"
+        b = f"{other.znach}.{other.drob}"
 
-        return chislo(str(float(self.znach + '.' + self.drob) * float(other.znach + '.' + other.drob)), '10').toP(osnov)
+        result_in_base = ""
+        carry = 0
+        shift_dot = 0
+
+        if '.' in a:
+            a = f"{a.split('.')[0]}.{a.split('.')[1]}"
+            if '.' in b:
+                b = f"{b.split('.')[0]}.{b.split('.')[1]}"
+                if len(a.split('.')[1]) < len(b.split('.')[1]):
+                    a += '0' * (len(b.split('.')[1]) - len(a.split('.')[1]))
+                else:
+                    b += '0' * (len(a.split('.')[1]) - len(b.split('.')[1]))
+            else:
+                b += '.'
+                b += '0' * len(a.split('.')[1])
+        else:
+            a += '.'
+            if '.' in b:
+                b = f"{b.split('.')[0]}.{b.split('.')[1]}"
+                if len(a.split('.')[1]) < len(b.split('.')[1]):
+                    a += '0' * (len(b.split('.')[1]) - len(a.split('.')[1]))
+                else:
+                    b += '0' * (len(a.split('.')[1]) - len(b.split('.')[1]))
+            else:
+                b += '.'
+                b += '0' * len(a.split('.')[1])
+
+        shift_dot += len(a.split('.')[1]) + len(b.split('.')[1])
+
+        a = a.replace('.', '')
+        b = b.replace('.', '')
+
+        for i in range(len(a) + len(b)):
+            result_digit = carry
+            for j in range(len(a)):
+                if i - j >= 0 and i - j < len(b):
+                    result_digit += int(a[len(a) - 1 - j], base) * int(b[len(b) - 1 - (i - j)], base)
+            
+            carry = result_digit // base
+            result_digit %= base
+
+            result_in_base = str(alphabet[result_digit]) + result_in_base
+
+        while len(result_in_base) > 1 and result_in_base[0] == "0":
+            result_in_base = result_in_base[1:]
+
+        return chislo((result_in_base[0:-shift_dot] + '.' + result_in_base[-shift_dot:]).rstrip('0'), base, self.accuracy)
