@@ -326,4 +326,10 @@ class chislo:
         while len(result_in_base) > 1 and result_in_base[0] == "0":
             result_in_base = result_in_base[1:]
 
-        return chislo((result_in_base[0:-shift_dot] + '.' + result_in_base[-shift_dot:]).rstrip('0'), base, self.accuracy)
+        res = (result_in_base[0:-shift_dot] + '.' + result_in_base[-shift_dot:]).rstrip('0')
+        if res[0] == '.':
+            res = '0' + res
+        
+        if res[-1] == '.':
+            res += '0'
+        return chislo(res, base, self.accuracy)
