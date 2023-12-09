@@ -1,7 +1,5 @@
 from ChisloLib import chislo
 
-a = chislo('AA', '16')
-b = chislo('A', '16')
-print(a + b)
-print(a - b)
+a = chislo('101', '2')
+b = chislo('111', '2')
 print(a * b)
