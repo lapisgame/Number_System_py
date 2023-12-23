@@ -65,6 +65,14 @@ class chislo:
                 self.znach = znach
                 self.drob = '0'
 
+    #! Принудительно уменьшить или увеличить количество знаком после запятой
+    def set_zero_drob(self, new_zero_count):
+        if (self.drob != '0'):
+            if self.accuracy > new_zero_count:
+                self.drob = self.drob[0:new_zero_count]
+            else:
+                self.drob += '0' * (new_zero_count - len(self.drob))
+
     #! Перевод в строку
     def __str__(self) -> str:
         if self.drob == None:
@@ -336,5 +344,92 @@ class chislo:
             res += '0'
         return chislo(res, base, self.accuracy)
     
+    #! self == other
+    def __eq__(self, other):
+        self = self.toP(self.osnov_int)
+        other = other.toP(self.osnov_int)
+        max_count = max(len(self.drob), len(other.drob))
+        self.set_zero_drob(max_count)
+        other.set_zero_drob(max_count)
+
+        return ((self.znach == other.znach) and (self.drob == other.drob))
+
+    #! self != other
+    def __ne__(self, other):
+        self = self.toP(self.osnov_int)
+        other = other.toP(self.osnov_int)
+        max_count = max(len(self.drob), len(other.drob))
+        self.set_zero_drob(max_count)
+        other.set_zero_drob(max_count)
+
+        return ((self.znach != other.znach) or (self.drob != other.drob))
+
+    #! self < other
+    def __lt__(self, other):
+        max_count = max(len(self.drob), len(other.drob))
+        self.set_zero_drob(max_count)
+        other.set_zero_drob(max_count)
+
+        self = self.to10()
+        other = other.to10()
+        return (int(self.znach) < int(other.znach)) or \
+                ((int(self.znach) == int(other.znach)) and (float('0.' + self.drob) < float('0.' + other.drob)))
+
+    #! self <= other
+    def __le__(self, other):
+        max_count = max(len(self.drob), len(other.drob))
+        self.set_zero_drob(max_count)
+        other.set_zero_drob(max_count)
+
+        self = self.to10()
+        other = other.to10()
+        return (int(self.znach) <= int(other.znach)) or \
+                ((int(self.znach) == int(other.znach)) and (float('0.' + self.drob) <= float('0.' + other.drob)))
+
+    #! self > other
+    def __gt__(self, other):
+        max_count = max(len(self.drob), len(other.drob))
+        self.set_zero_drob(max_count)
+        other.set_zero_drob(max_count)
+
+        self = self.to10()
+        other = other.to10()
+        return (int(self.znach) > int(other.znach)) or \
+                ((int(self.znach) == int(other.znach)) and (float('0.' + self.drob) > float('0.' + other.drob)))
+
+    #! self >= other
+    def __ge__(self, other):
+        max_count = max(len(self.drob), len(other.drob))
+        self.set_zero_drob(max_count)
+        other.set_zero_drob(max_count)
+
+        self = self.to10()
+        other = other.to10()
+        return (int(self.znach) >= int(other.znach)) or \
+                ((int(self.znach) == int(other.znach)) and (float('0.' + self.drob) >= float('0.' + other.drob)))
+
+    #! Self делится на Other по обычным правилам
     def __truediv__(self, other):
-        print(f"{self} / {other}")
+        new_znach = ""
+        new_drob = ""
+
+        max_count = max(len(self.drob), len(other.drob))
+
+        count = 0
+        while self > other:
+            self = self - other
+            count += 1
+
+        print(self)
+        print(other)
+        return count
+    
+    #! Целочисленное деление Self на Other
+    def __floordiv__(self, other):
+        print(f"{self} // {other}")
+        return 0
+    
+    #! Остаток от деление Self на Other
+    def __mod__(self, other):
+        print(f"{self} % {other}")
+        return 0
