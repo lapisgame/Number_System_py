@@ -10,13 +10,15 @@ def sub_str(str:str):
         res += mini[i] 
     return res
 
-alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-class chislo:    
+
+class chislo:
+    #! Первоначальное создание объекта    
     def __init__(self, znach=None, osnov=None, accuracy=9) -> None: 
         #^ Желаемая точность вычислений дробной части
         self.accuracy = accuracy
 
+        self.alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         if (znach == None or osnov == None):
             znach = (input('Znach = ')).upper()
             osnov = int(input('Osnov = '))
@@ -26,7 +28,7 @@ class chislo:
             if self.osnov < 2:
                 raise Exception('Основание меньше минимально допустимого')
             
-            alph_slice = alphabet[0:osnov]
+            alph_slice = self.alphabet[0:osnov]
             alph_slice += '.'
             for item in znach:
                 if item not in alph_slice:
@@ -47,7 +49,7 @@ class chislo:
             if self.osnov_int < 2:
                 raise Exception('Основание меньше минимально допустимого')
             
-            alph_slice = alphabet[0:self.osnov_int]
+            alph_slice = self.alphabet[0:self.osnov_int]
             alph_slice += '.'
 
             znach = str(znach).upper()
@@ -63,30 +65,32 @@ class chislo:
                 self.znach = znach
                 self.drob = '0'
 
-    #^ Перевод в строку
+    #! Перевод в строку
     def __str__(self) -> str:
         if self.drob == None:
             return f'{self.znach}.0{self.osnov}'
         else:
             return f'{self.znach}.{self.drob}{self.osnov}'
     
+    #! Перевод в 10-тичную систему счисления
     def to10(self):
         new_znach = 0
         count = 0
 
         for item in reversed(self.znach):
-            new_znach += int(alphabet.find(item))*(int(self.osnov_int)**count)
+            new_znach += int(self.alphabet.find(item))*(int(self.osnov_int)**count)
             count += 1
         
         if self.drob != '':
             count = -1
             for item in self.drob:
-                new_znach += int(alphabet.find(item))*(int(self.osnov_int)**count)
+                new_znach += int(self.alphabet.find(item))*(int(self.osnov_int)**count)
                 count -= 1
 
         new_osnov = 10
         return chislo(znach=new_znach, osnov=new_osnov, accuracy=self.accuracy)
     
+    #! ПЕревод в Р-ричную систему счисления
     def toP(self, new_osnov:int):
         if self.osnov_int != 10:
             self = self.to10()
@@ -99,11 +103,11 @@ class chislo:
         old_drob = float('0.' + self.drob)
         
         while old_znach > 0:
-            new_znach += alphabet[old_znach % new_osnov]
+            new_znach += self.alphabet[old_znach % new_osnov]
             old_znach //= new_osnov
         
         while lencount < self.accuracy:
-            new_drob += alphabet[int(old_drob * new_osnov)]
+            new_drob += self.alphabet[int(old_drob * new_osnov)]
             old_drob = (old_drob * new_osnov) % 1
             lencount += 1
 
@@ -149,8 +153,8 @@ class chislo:
         # Поразрядное суммирование 
         carry = 0
         while pointer_drob2 >= 0:
-            summ = alphabet.find(self.drob[pointer_drob1]) + alphabet.find(other.drob[pointer_drob2]) + carry
-            addition_bit = alphabet[summ % self.osnov_int]
+            summ = self.alphabet.find(self.drob[pointer_drob1]) + self.alphabet.find(other.drob[pointer_drob2]) + carry
+            addition_bit = self.alphabet[summ % self.osnov_int]
             new_drob += str(addition_bit)
             carry = summ // self.osnov_int
 
@@ -162,8 +166,8 @@ class chislo:
         # в процессе складываем значения и пишем их по модулю
         # carry = 0
         while pointer2 >= 0:
-            summ = alphabet.find(self.znach[pointer1]) + alphabet.find(other.znach[pointer2]) + carry
-            addition_bit = alphabet[summ % self.osnov_int]
+            summ = self.alphabet.find(self.znach[pointer1]) + self.alphabet.find(other.znach[pointer2]) + carry
+            addition_bit = self.alphabet[summ % self.osnov_int]
             new_znach += str(addition_bit)
             carry = summ // self.osnov_int
 
@@ -172,8 +176,8 @@ class chislo:
 
         # Добегаем остальные позиции в числе
         while pointer1 >= 0:
-            summ = alphabet.find(self.znach[pointer1]) + carry
-            addition_bit = alphabet[summ % self.osnov_int]
+            summ = self.alphabet.find(self.znach[pointer1]) + carry
+            addition_bit = self.alphabet[summ % self.osnov_int]
             new_znach += str(addition_bit)
             carry = summ // self.osnov_int
 
@@ -188,7 +192,6 @@ class chislo:
         new_drob = new_drob[::-1]
 
         return chislo(znach=f'{new_znach}.{new_drob}', osnov=self.osnov_int)
-
 
     #!Вычитание Other из Self
     def __sub__(self, other):
@@ -236,7 +239,7 @@ class chislo:
 
             # Вычисляем текущий разряд результата
             result_digit = digit1 - digit2
-            result_drob = alphabet[result_digit] + result_drob
+            result_drob = self.alphabet[result_digit] + result_drob
 
         # Удаляем ведущие нули
         result_drob = result_drob.rstrip('0')
@@ -262,7 +265,7 @@ class chislo:
 
             # Вычисляем текущий разряд результата
             result_digit = digit1 - digit2
-            result = alphabet[result_digit] + result
+            result = self.alphabet[result_digit] + result
 
         # Удаляем ведущие нули
         result = result.lstrip('0')
@@ -272,8 +275,7 @@ class chislo:
 
         return chislo(znach=f'{result}.{result_drob}', osnov=base)
 
-
-    #! Пока только целое
+    #! Умножает Self на Other
     def __mul__(self, other):
         base = self.osnov_int
         
@@ -321,7 +323,7 @@ class chislo:
             carry = result_digit // base
             result_digit %= base
 
-            result_in_base = str(alphabet[result_digit]) + result_in_base
+            result_in_base = str(self.alphabet[result_digit]) + result_in_base
 
         while len(result_in_base) > 1 and result_in_base[0] == "0":
             result_in_base = result_in_base[1:]
@@ -333,3 +335,6 @@ class chislo:
         if res[-1] == '.':
             res += '0'
         return chislo(res, base, self.accuracy)
+    
+    def __truediv__(self, other):
+        print(f"{self} / {other}")
