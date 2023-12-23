@@ -1,17 +1,3 @@
-def sub_str(str:str):
-    mini = {'0':'\u2080', 
-            '1':'\u2081', '2':'\u2082', '3':'\u2083', 
-            '4':'\u2084', '5':'\u2085', '6':'\u2086', 
-            '7':'\u2087', '8':'\u2088', '9':'\u2089'
-    }
-
-    res = ""
-    for i in str:
-        res += mini[i] 
-    return res
-
-
-
 class chislo:
     #! Первоначальное создание объекта    
     def __init__(self, znach=None, osnov=None, accuracy=9) -> None: 
@@ -40,7 +26,7 @@ class chislo:
                 self.znach = znach
                 self.drob = '0'
             
-            self.osnov = sub_str(osnov).upper()
+            self.osnov = self._sub_str(osnov).upper()
         else:       
             self.accuracy = accuracy             
             self.osnov_int = int(osnov)
@@ -57,7 +43,7 @@ class chislo:
                 if item not in alph_slice:
                     raise Exception(f'{item} - Недопустимые символы для данного алфавита. максимальный символ алфавита - {alph_slice[-2]}')
                 
-            self.osnov = sub_str(str(osnov)).upper()
+            self.osnov = self._sub_str(str(osnov)).upper()
 
             if '.' in str(znach):
                 self.znach, self.drob = str(znach).split('.')
@@ -67,6 +53,19 @@ class chislo:
 
             if len(self.drob) > self.accuracy:
                 self.drob = self.drob[0:self.accuracy]
+
+    #! Заменить обычные цифры на маленькие
+    def _sub_str(str:str):
+        mini = {'0':'\u2080', 
+                '1':'\u2081', '2':'\u2082', '3':'\u2083', 
+                '4':'\u2084', '5':'\u2085', '6':'\u2086', 
+                '7':'\u2087', '8':'\u2088', '9':'\u2089'
+        }
+
+        res = ""
+        for i in str:
+            res += mini[i] 
+        return res
 
     #! Принудительно уменьшить или увеличить количество знаком после запятой
     def set_zero_drob(self, new_zero_count):
