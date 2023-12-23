@@ -65,6 +65,9 @@ class chislo:
                 self.znach = znach
                 self.drob = '0'
 
+            if len(self.drob) > self.accuracy:
+                self.drob = self.drob[0:self.accuracy]
+
     #! Принудительно уменьшить или увеличить количество знаком после запятой
     def set_zero_drob(self, new_zero_count):
         if (self.drob != '0'):
@@ -410,26 +413,72 @@ class chislo:
 
     #! Self делится на Other по обычным правилам
     def __truediv__(self, other):
+        if (self.osnov_int != other.osnov_int):
+            other = other.toP(self.osnov_int)
+
         new_znach = ""
         new_drob = ""
 
-        max_count = max(len(self.drob), len(other.drob))
-
-        count = 0
+        count_znach = 0
         while self > other:
             self = self - other
+            count_znach += 1
+
+        ten = chislo(10, self.osnov_int)
+        count = 0
+        max_acc = max(self.accuracy, other.accuracy)
+
+        while count < max_acc:
+            count_drob = 0
+            self = self * ten
+            while self > other:
+                self = self - other
+                count_drob += 1
+
+            new_drob += self.alphabet[count_drob]
             count += 1
 
-        print(self)
-        print(other)
-        return count
+        if (new_drob == (self.alphabet[self.osnov_int-1] * max_acc)):
+            count_znach += 1
+            new_drob = "0"
+
+
+        while count_znach > 0:
+            new_znach = self.alphabet[count_znach % self.osnov_int] + new_znach
+            count_znach //= self.osnov_int
+
+
+        if (new_znach == ""):
+            new_znach = "0"
+        if (new_drob == ""):
+            new_drob = "0"
+
+        return chislo(f"{new_znach}.{new_drob}", self.osnov_int, max_acc)
     
     #! Целочисленное деление Self на Other
     def __floordiv__(self, other):
-        print(f"{self} // {other}")
-        return 0
+        if (self.osnov_int != other.osnov_int):
+            other = other.toP(self.osnov_int)
+
+        new_znach = ""
+        new_drob = "0"
+
+        count_znach = 0
+        while self > other:
+            self = self - other
+            count_znach += 1
+
+        max_acc = max(self.accuracy, other.accuracy)
+
+        while count_znach > 0:
+            new_znach = self.alphabet[count_znach % self.osnov_int] + new_znach
+            count_znach //= self.osnov_int
+
+        if (new_znach == ""):
+            new_znach = "0"
+
+        return chislo(f"{new_znach}.{new_drob}", self.osnov_int, max_acc)
     
     #! Остаток от деление Self на Other
     def __mod__(self, other):
-        print(f"{self} % {other}")
-        return 0
+        return self - other * (self // other)
