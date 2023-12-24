@@ -55,7 +55,7 @@ class chislo:
                 self.drob = self.drob[0:self.accuracy]
 
     #! Заменить обычные цифры на маленькие
-    def _sub_str(str:str):
+    def _sub_str(self, str:str):
         mini = {'0':'\u2080', 
                 '1':'\u2081', '2':'\u2082', '3':'\u2083', 
                 '4':'\u2084', '5':'\u2085', '6':'\u2086', 
@@ -234,8 +234,8 @@ class chislo:
         result_drob = ""
         
         for i in range(len(num1_drob) - 1, -1, -1):
-            digit1 = int(num1_drob[i], base)
-            digit2 = int(num2_drob[i], base)
+            digit1 = self.alphabet.find(num1_drob[i])
+            digit2 = self.alphabet.find(num2_drob[i])
 
             # Учитываем заем
             digit1 -= borrow
@@ -251,7 +251,7 @@ class chislo:
             result_digit = digit1 - digit2
             result_drob = self.alphabet[result_digit] + result_drob
 
-        # Удаляем ведущие нули
+        # Удаляем замыкающие нули
         result_drob = result_drob.rstrip('0')
 
         if len(result_drob) == 0:
@@ -260,8 +260,8 @@ class chislo:
         # Выполняем вычитание над целой частью
         result = ""
         for i in range(len(num1) - 1, -1, -1):
-            digit1 = int(num1[i], base)
-            digit2 = int(num2[i], base)
+            digit1 = self.alphabet.find(num1[i])
+            digit2 = self.alphabet.find(num2[i])
 
             # Учитываем заем
             digit1 -= borrow
